@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'" />
 <meta name="referrer" content="strict-origin-when-cross-origin" />
 <meta name="author" content="Huan Bellini" />
 <script>
@@ -15,18 +15,17 @@ try{if(localStorage.getItem('hb-motion')==='off')document.documentElement.classL
 <meta name="description" content="Huan Bellini — Web Designer & UX. +5 anos e +50 sites entregues, de negócios locais a marcas reconhecidas. Sites sob medida, com foco em experiência, performance e resultado." />
 <meta name="theme-color" content="#05070d" />
 <meta name="robots" content="index,follow" />
-<!-- Open Graph / compartilhamento (troque SEU-DOMINIO pelo domínio real ao publicar) -->
+<!-- Open Graph / compartilhamento -->
 <meta property="og:type" content="website" />
 <meta property="og:title" content="Huan Bellini — Web Designer & UX" />
 <meta property="og:description" content="+5 anos, +50 sites entregues. Sites sob medida que convertem de verdade." />
-<meta property="og:url" content="https://SEU-DOMINIO.com.br/" />
-<meta property="og:image" content="https://SEU-DOMINIO.com.br/assets/og-cover.jpg" />
+<meta property="og:url" content="https://huanbellini.github.io/portfolio/" />
+<meta property="og:image" content="https://huanbellini.github.io/portfolio/assets/og-cover.jpg" />
 <meta property="og:locale" content="pt_BR" />
 <meta name="twitter:card" content="summary_large_image" />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2305070d'/%3E%3Ctext x='32' y='42' font-family='Arial,Helvetica,sans-serif' font-weight='800' font-size='26' fill='%23ffab07' text-anchor='middle'%3EHB%3C/text%3E%3C/svg%3E" />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@1,500;1,600&display=swap" rel="stylesheet" />
+<link rel="preload" href="assets/fonts/manrope.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="assets/fonts/playfair-italic.woff2" as="font" type="font/woff2" crossorigin />
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"Person","name":"Huan Bellini","jobTitle":"Web Designer & UX",
  "description":"Web Designer & UX — +5 anos, +50 sites entregues.",
@@ -34,6 +33,11 @@ try{if(localStorage.getItem('hb-motion')==='off')document.documentElement.classL
  "sameAs":["https://www.linkedin.com/in/huanbellini/"]}
 </script>
 <style>
+  /* fontes locais (variáveis) — sem bloqueio de rede externa no primeiro paint */
+  @font-face{font-family:'Manrope';font-style:normal;font-weight:400 800;font-display:swap;
+    src:url('assets/fonts/manrope.woff2') format('woff2')}
+  @font-face{font-family:'Playfair Display';font-style:italic;font-weight:400 900;font-display:swap;
+    src:url('assets/fonts/playfair-italic.woff2') format('woff2')}
   :root{
     --bg:#05070d;
     --ink:#f3f5fa;
@@ -313,7 +317,8 @@ try{if(localStorage.getItem('hb-motion')==='off')document.documentElement.classL
   .dcard .shot .bar i{width:8px;height:8px;border-radius:50%;background:#39415a}
   .dcard .shot .bar .u{margin-left:10px;font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .dcard .shot .img{position:absolute;top:30px;left:0;right:0;bottom:0;overflow:hidden;container-type:size}
-  .dcard .shot .img img{position:absolute;top:0;left:0;width:100%;height:auto;display:block;z-index:2}
+  .dcard .shot .img img{position:absolute;top:0;left:0;width:100%;height:auto;display:block;z-index:2;
+    -webkit-user-drag:none;user-select:none;-webkit-user-select:none}
   .dcard.front .shot .img img{animation:reveal 8s ease-in-out 1.2s infinite alternate}
   @keyframes reveal{0%{transform:translateY(0)}100%{transform:translateY(calc(-100% + 100cqh))}}
   .dcard .fallback{position:absolute;inset:30px 0 0;z-index:1;display:flex;align-items:flex-end;padding:22px;background:radial-gradient(120% 120% at 20% 0%,var(--c1,#1a2036) 0%,#0b0d16 72%)}
@@ -355,7 +360,7 @@ try{if(localStorage.getItem('hb-motion')==='off')document.documentElement.classL
   .foot{margin-top:clamp(40px,6vh,60px);display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px;
     font-size:14px;letter-spacing:.10em;text-transform:uppercase;color:var(--muted)}
 
-  /* ============== modal ============== */
+  /* ============== modal de preview (abre SÓ pela setinha ↗) ============== */
   .modal{position:fixed;inset:0;z-index:90;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(3,5,10,.88);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
   .modal.open{display:flex}
   .modal .box{position:relative;width:min(1000px,100%);max-height:90vh;border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,.12);background:#0b1020;display:flex;flex-direction:column}
@@ -509,7 +514,7 @@ try{if(localStorage.getItem('hb-motion')==='off')document.documentElement.classL
         <div class="work-copy">
           <div class="tag reveal-word">Projetos selecionados</div>
           <h2 class="reveal-word">Desenvolvo projetos <br> que <em class="type-wrap"><span id="typeword">convertem</span><span class="caret" aria-hidden="true"></span></em> de verdade.</h2>
-          <p class="reveal-word">+50 projetos entregues em 5 anos, de negócios locais a marcas reconhecidas. Cada site é feito sob medida, do primeiro clique à conversão. Arraste para navegar ou toque para abrir.</p>
+          <p class="reveal-word">+50 projetos entregues em 5 anos, de negócios locais a marcas reconhecidas. Cada site é feito sob medida, do primeiro clique à conversão. Arraste para navegar e toque em ↗ para ver de perto.</p>
           <div class="deck-ui">
             <button class="nav-btn" id="prev" aria-label="Projeto anterior"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
             <button class="nav-btn" id="next" aria-label="Próximo projeto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></button>
@@ -519,7 +524,7 @@ try{if(localStorage.getItem('hb-motion')==='off')document.documentElement.classL
           <span class="sr-live" id="deck-live" aria-live="polite" style="position:absolute;left:-9999px"></span>
         </div>
         <div class="deck" id="deck"></div>
-        <div class="swipe-hint">← Deslize para navegar · toque para abrir →</div>
+        <div class="swipe-hint">← Deslize para navegar · ↗ abre o preview</div>
       </div>
     </section>
 
@@ -541,7 +546,7 @@ try{if(localStorage.getItem('hb-motion')==='off')document.documentElement.classL
   <div class="modal" id="modal" aria-hidden="true">
     <div class="box">
       <div class="mbar"><span id="mtitle"></span><span><a id="mlink" href="#" target="_blank" rel="noopener noreferrer">Abrir site ↗</a> &nbsp; <button class="close" id="mclose" aria-label="Fechar">✕</button></span></div>
-      <div class="scroll"><img id="mimg" alt="" /></div>
+      <div class="scroll"><img id="mimg" alt="" draggable="false" /></div>
     </div>
   </div>
 
@@ -579,7 +584,8 @@ BLOBS.forEach((b,i)=>{
   w.style.left=`calc(${b.x}% - ${b.s/2}vmax)`; w.style.top=`calc(${b.y}% - ${b.s/2}vmax)`;
   const dr=document.createElement('div'); dr.className='bdrift d'+b.d;
   const mk=(cols,op)=>{const l=document.createElement('div');l.className='blayer breathe';
-    l.style.background=grad(cols);l.style.filter='blur('+b.blur+'px)';
+    l.style.background=grad(cols);
+    l.style.filter='blur('+(isSmall?Math.round(b.blur*.6):b.blur)+'px)';  /* GPU do celular agradece */
     l.style.setProperty('--bt',b.bt+'s');l.style.animationDelay=(-b.bt*0.6*i)+'s';l.style.opacity=op;return l;};
   const lh=mk(b.h,1), lw=mk(b.w,0), lc=mk(b.c,0);
   dr.append(lh,lw,lc); w.appendChild(dr); uni.appendChild(w);
@@ -828,18 +834,19 @@ const PROJECTS=[
   {slug:'simplific',  name:'Simplific Tech',    cat:'Agência Web & TI',     url:'https://simplifictech.com.br/',         c1:'#122a4a'},
 ];
 const N=PROJECTS.length;
+const IMGSUF=isSmall?'-m':'';                    /* celular: prints 800px (~65% menores) */
 const host=u=>u.replace(/^https?:\/\//,'').replace(/\/$/,'');
 const deck=document.getElementById('deck');
 deck.innerHTML=PROJECTS.map((p,i)=>`
   <article class="dcard" data-i="${i}" style="--c1:${p.c1}"><div class="tin">
     <div class="top">
       <div><div class="cat">${p.cat}</div><div class="nm">${p.name}</div></div>
-      <button class="open" data-url="${p.url}" aria-label="Abrir ${p.name}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H8M17 7V16"/></svg></button>
+      <button class="open" aria-label="Ver preview de ${p.name}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H8M17 7V16"/></svg></button>
     </div>
     <div class="shot">
       <div class="bar"><i></i><i></i><i></i><span class="u">${host(p.url)}</span></div>
       <div class="img">
-        <img alt="Site ${p.name}" data-src="assets/projects/${p.slug}.jpg" decoding="async"
+        <img alt="Site ${p.name}" data-src="assets/projects/${p.slug}${IMGSUF}.jpg" decoding="async" draggable="false"
              onerror="this.closest('.dcard').classList.add('noimg');this.remove()" />
         <div class="fallback"><span class="big2">${p.name}</span></div>
       </div>
@@ -887,7 +894,11 @@ function goTo(i){active=((i%N)+N)%N;layout();restart();}
 document.getElementById('next').onclick=()=>go(1);
 document.getElementById('prev').onclick=()=>go(-1);
 dots.forEach(d=>d.onclick=()=>goTo(+d.dataset.i));
-deck.addEventListener('click',e=>{const ob=e.target.closest('.open');if(ob){e.stopPropagation();window.open(ob.dataset.url,'_blank','noopener,noreferrer');}});
+deck.addEventListener('click',e=>{
+  const ob=e.target.closest('.open');
+  if(ob){e.stopPropagation();openModal(+ob.closest('.dcard').dataset.i);}   /* setinha ↗ = preview DENTRO do site */
+});
+deck.addEventListener('dragstart',e=>e.preventDefault());   /* mata o arraste nativo da imagem (bloqueava o swipe) */
 let startX=0,moved=0,downCard=null;
 deck.addEventListener('pointerdown',e=>{
   if(e.target.closest('.open'))return;
@@ -906,7 +917,7 @@ function endDrag(){
   const off=dragOffset;dragOffset=0;
   const TH=isSmall?60:80;                        /* swipe mais sensível no celular */
   if(off<=-TH)go(1); else if(off>=TH)go(-1);
-  else{layout();restart(); if(moved<10&&downCard)openModal(active);}
+  else{layout();restart();}                      /* clique no card não abre nada — só a setinha ↗ */
 }
 deck.addEventListener('pointerup',endDrag);
 deck.addEventListener('pointercancel',endDrag);
@@ -933,14 +944,16 @@ function openModal(i){
   const p=PROJECTS[i],card=cards[i];
   if(card.classList.contains('noimg')){window.open(p.url,'_blank','noopener,noreferrer');return;}
   const mimg=document.getElementById('mimg');
-  mimg.src=`assets/projects/${p.slug}.jpg`;
+  mimg.src=`assets/projects/${p.slug}${IMGSUF}.jpg`;
   mimg.alt=`Página completa do site ${p.name}`;
   document.getElementById('mtitle').textContent=`${p.name} · ${p.cat}`;
   document.getElementById('mlink').href=p.url;
   const modal=document.getElementById('modal');
-  modal.classList.add('open');stop();
-  document.documentElement.style.overflow='hidden';  /* fundo não rola com o modal aberto */
-  /* FLIP: o card da frente expande até virar o modal */
+  modal.classList.add('open');
+  modal.querySelector('.scroll').scrollTop=0;
+  stop();
+  document.documentElement.style.overflow='hidden';  /* fundo não rola com o preview aberto */
+  /* FLIP: o card expande até virar o preview */
   if(window.gsap&&!reduce){
     const box=modal.querySelector('.box');
     const c=card.getBoundingClientRect(), b=box.getBoundingClientRect();
