@@ -279,7 +279,7 @@ try{if(localStorage.getItem('hb-motion')==='off')document.documentElement.classL
   .work-copy .tag{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:#fff;opacity:.85;margin-bottom:20px}
   .work-copy h2{font-size:clamp(1.75rem,3.4vw,3.1rem);font-weight:800;letter-spacing:-.02em;line-height:1.1}
   .work-copy h2 em{font-family:'Playfair Display',serif;font-style:italic;font-weight:500;color:var(--teal)}
-  .type-wrap{display:inline}
+  .type-wrap{display:inline-block;text-align:left}   /* largura travada via JS: layout não pula ao digitar/apagar */
   #typeword{background:linear-gradient(90deg,#00ffe0,#4affd4,#ffd76a,#ffab07,#ff5e3a,#c07bff,#00ffe0);
     background-size:300% 100%;-webkit-background-clip:text;background-clip:text;
     -webkit-text-fill-color:transparent;color:transparent;animation:twshift 6s linear infinite}
@@ -420,6 +420,11 @@ try{if(localStorage.getItem('hb-motion')==='off')document.documentElement.classL
     .foot{flex-direction:column;gap:6px;margin-top:28px}
     /* efeitos extras desligados em tela pequena (bateria) */
     .aurora.a2,.shoot.s2,.shoot.s3{display:none}
+    /* dieta de GPU p/ WebKit (iPhone): sem filtros/repaints contínuos que travavam o carregamento */
+    .aurora{filter:none;opacity:.4}
+    .grain{display:none}
+    .title .shine{display:none}
+    .dcard{-webkit-backdrop-filter:none;backdrop-filter:none}
   }
   @media (prefers-reduced-motion:reduce){
     *{animation-duration:.001ms!important;animation-iteration-count:1!important}
@@ -577,6 +582,8 @@ const BLOBS=[
 ];
 if(isSmall)BLOBS.length=4;                       /* celular: 4 blobs bastam */
 const grad=c=>`radial-gradient(circle at 50% 50%,rgba(${c[0]},${c[1]},${c[2]},${c[3]}) 0%,rgba(${c[0]},${c[1]},${c[2]},${c[3]*.45}) 34%,transparent 66%)`;
+/* celular: gradiente já nasce suave (dispensa blur() — a GPU do iPhone não re-rasteriza nada) */
+const gradSoft=c=>`radial-gradient(circle at 50% 50%,rgba(${c[0]},${c[1]},${c[2]},${c[3]}) 0%,rgba(${c[0]},${c[1]},${c[2]},${c[3]*.6}) 28%,rgba(${c[0]},${c[1]},${c[2]},${c[3]*.22}) 52%,transparent 72%)`;
 const wraps=[], layersH=[], layersW=[], layersC=[];
 BLOBS.forEach((b,i)=>{
   const w=document.createElement('div'); w.className='bwrap';
@@ -584,8 +591,8 @@ BLOBS.forEach((b,i)=>{
   w.style.left=`calc(${b.x}% - ${b.s/2}vmax)`; w.style.top=`calc(${b.y}% - ${b.s/2}vmax)`;
   const dr=document.createElement('div'); dr.className='bdrift d'+b.d;
   const mk=(cols,op)=>{const l=document.createElement('div');l.className='blayer breathe';
-    l.style.background=grad(cols);
-    l.style.filter='blur('+(isSmall?Math.round(b.blur*.6):b.blur)+'px)';  /* GPU do celular agradece */
+    l.style.background=(isSmall?gradSoft:grad)(cols);
+    if(!isSmall)l.style.filter='blur('+b.blur+'px)';
     l.style.setProperty('--bt',b.bt+'s');l.style.animationDelay=(-b.bt*0.6*i)+'s';l.style.opacity=op;return l;};
   const lh=mk(b.h,1), lw=mk(b.w,0), lc=mk(b.c,0);
   dr.append(lh,lw,lc); w.appendChild(dr); uni.appendChild(w);
@@ -681,8 +688,8 @@ if(finePointer && !reduce){
 }
 function driveCursor(t){
   if(!(finePointer&&!reduce)){
-    /* touch: lupa cromática deriva sozinha no título */
-    if(titleRect&&titleRect.bottom>0&&titleRect.top<innerHeight){
+    /* touch: lupa cromática deriva sozinha no título — só em TABLET (no celular repintava o título a cada frame) */
+    if(!isSmall&&titleRect&&titleRect.bottom>0&&titleRect.top<innerHeight){
       const px=titleRect.width*(.5+.34*Math.sin(t*.6)), py=titleRect.height*(.5+.3*Math.sin(t*.9+1));
       title.style.setProperty('--mx',px+'px'); title.style.setProperty('--my',py+'px');
     }
@@ -800,6 +807,25 @@ console.log(
 const WORDS=['convertem','vendem','engajam'];
 const typeEl=document.getElementById('typeword');
 let twTimer=null;
+
+/* reserva a largura da palavra mais larga — a frase nunca reflui (fim da "tirolesa") */
+const typeWrap=typeEl.parentElement;
+function lockTypeWidth(){
+  const cs=getComputedStyle(typeEl);
+  const probe=document.createElement('span');
+  probe.style.cssText='position:absolute;visibility:hidden;white-space:nowrap';
+  probe.style.fontFamily=cs.fontFamily; probe.style.fontSize=cs.fontSize;
+  probe.style.fontStyle=cs.fontStyle;   probe.style.fontWeight=cs.fontWeight;
+  probe.style.letterSpacing=cs.letterSpacing;
+  document.body.appendChild(probe);
+  let max=0;
+  WORDS.forEach(w=>{probe.textContent=w; max=Math.max(max,probe.getBoundingClientRect().width);});
+  probe.remove();
+  typeWrap.style.minWidth=Math.ceil(max+6)+'px';   /* +6px: caret */
+}
+lockTypeWidth();
+addEventListener('resize',lockTypeWidth);
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(lockTypeWidth);
 function typewriter(){
   if(reduce){typeEl.textContent='convertem';return;}
   let wi=0, ci=WORDS[0].length, mode='hold', last=0;
